@@ -1,0 +1,234 @@
+---
+title: "数据转换"
+author: "巩伟明"
+date: "2020/3/5"
+output: html_document
+---
+## 数据导入
+```{r}
+# 键盘输入
+mydata <- data.frame(age=numeric(0))
+edit(mydata)
+
+# 导入文件
+x <- read.table("路径")
+x <- read.csv("路径")
+x <- read.delin("路径")
+head(x)
+x <- read.table ("input.csv",sep=",")#注意csv文件分隔符
+x <- read.table ("input.csv",sep=",",header = T,skip = 50,nrows = 100,stringsAsFactors = F)
+x <- read.csv ("input.csv",header = T)
+
+# 网址文本文件
+x <- read.table("https://codeload.github.com/mperdeck/LINQtoCSV/zip/master",header = TRUE)
+
+# 网页文件
+install.packages("XML")
+require(XML)
+readHTMLTable("https://en.wikipedia.org/wiki/World_population",which=3)
+```
+
+
+
+##判断数据类型，转换数据类型
+```{r setup, include=FALSE}
+a <- state.x77
+class(state)
+is.data.frame(a)
+as.data.frame(a)
+is.data.frame(a)
+methods(is)
+methods(as)
+```
+
+
+## 向量转数据框、列表、因子
+```{r setup, include=FALSE}
+x <- state.abb
+dim(x) <- c(5,10)
+x
+x <- state.abb
+as.factor(x)
+x
+as.list(x)
+x
+state <- data.frame(x,state.region,state.x77)
+state$Income
+state["Nevada",]
+unname(state)#去除列名
+```
+
+
+## 取子集
+```{r}
+#直接取
+sta<-as.data.frame(state.x77)
+who1 <- sta[c(1:10),c(1:3)]
+who2 <- sta[c(1,3,5,8),c(2,5)]
+who3 <- sta[which(sta$Income>3000 & sta$Income<5000),]
+who4 <- sta[sta$Income>3000 & sta$Income<5000,]
+#subset方法取
+?subset
+who5=subset(sta,sta$Income>3000 & sta$Income<5000)
+```
+
+
+## 采样
+```{r}
+?sample
+x <- 1:100
+sample(x,30)
+sample(x,30,replace = T)
+sample(x,60,replace = F)
+sort(sample(x,60,replace = T))
+```
+
+
+##删除与添加变量
+```{r}
+## 删除
+sta[,-1:-5]
+mtcars$mpg <- NULL
+USArrests
+##增加
+sta$add <- state.abb
+sta
+```
+
+
+##添加与合并
+```{r}
+#合并列
+data.frame(state.division,USArrests)
+cbind(USArrests,state.division)
+#合并行
+data1 <- head(USArrests,20)
+data2 <- tail(USArrests,20)
+data3 <- head(cbind(USArrests,state.division),20)
+rbind(data3,data2)
+
+data1 <- head(USArrests,30)
+data2 <- tail(USArrests,30)
+data4 <- rbind(data1,data2)
+rownames(data4)
+length(rownames(data4))
+
+duplicated(data4)#判断重复值，返回布尔值
+data4[duplicated(data4),]#取出重复部分
+data4[!duplicated(data4),]#取出非重复部分
+unique (data4)#一步去除重复
+```
+
+
+## 转置、翻转、排序
+```{r}
+## 数据框转置
+mtcars
+sractm <- t(mtcars)
+## 向量翻转
+letters
+rev(letters)
+## 列表翻转
+women[rev(rownames(women)),]
+## 数据框某一列转换
+transform(women, height = height*2.54)
+women$height = women$height*2.54
+## 排序sort(返回排序后的值，用于向量) order(返回排序后的序号，用于数据框) rank
+#####向量排序
+sort(rivers)
+sort(state.name)
+rev(sort(rivers))
+#####数据框排序
+order (rivers)
+mtcars[order(mtcars$wt),]
+mtcars[order(-mtcars$wt),]
+mtcars[order(mtcars$gear,mtcars$carb),]
+```
+
+##apply函数
+```{r}
+## 行列数据统计
+sta<-as.data.frame(state.x77)
+rs <- rowSums(sta)
+cm <- colMeans(sta)
+
+#apply 函数:向量、数据框
+apply
+apply(sta,MARGIN = 1,FUN = sum)
+apply(sta,MARGIN = 2,FUN = mean)
+
+#lapply sapply函数：列表
+state.center
+lapply(state.center,FUN = length)
+sapply(state.center,FUN = length)
+#tapply 函数 ：因子
+state.name
+state.division
+tapply(state.name,state.division,length)
+```
+
+## 中心化、标准化
+```{r}
+#scale and center
+state.x77
+heatmap(state.x77)
+
+?scale
+x <- scale(state.x77,scale = T,center = T)
+heatmap(x)
+```
+
+
+##缺失值
+```{r}
+### R 缺失值处理
+# 空值不可计算，计算式中包含空值则返回空值
+x <- c(1,2,3,NA,3)
+y <- sum(x)
+y
+# 判断缺失值（返回布尔值）
+is.na(data)      
+is.na(data$c)
+colsums(y)
+rowsums(y)#判断行列缺失值个数
+# 处理缺失值
+y <- sum(x,na.rm = TRUE)# 忽略缺失值
+y
+na.omit(data)           # 删除缺失值所在行
+```
+
+## dplyr包
+```{r}
+library(dplyr)
+ls("package:dplyr")
+#过滤
+dplyr::filter (iris,Sepal.Length >7)
+#去重
+dplyr::distinct(rbind(iris[1:10,],iris[1:15,]))
+#取行
+dplyr::slice(iris,10:15)
+#取样
+dplyr::sample_n(iris,10)
+dplyr::sample_frac(iris,0.1)#按比例
+#排序
+dplyr::arrange(iris,Sepal.Length)
+dplyr::arrange(iris,desc(Sepal.Length))#反向
+#统计
+summarise(iris,avg=mean(Sepal.Length))
+summarise(iris,sum=sum(Sepal.Length))
+#分组
+dplyr::group_by(iris,Species)
+#管道
+head(mtcars,20) %>% tail()
+iris %>% group_by(Species) %>% summarise(avg=mean(Sepal.Width)) %>% arrange(avg)
+#添加
+dplyr::mutate(iris,new=Sepal.Length+Petal.Length)
+#交叉并补
+first <- slice(mtcars,1:20)
+second <- slice (mtcars,10:30)
+intersect(first, second)#交
+union_all(first, second)#并
+union(first, second)
+setdiff(first, second)#补
+setdiff(second, first)#补
+```

@@ -1,0 +1,66 @@
+---
+title: "R基本操作及语句"
+output: html_document
+---
+### 快捷键
+tab键补齐  上键查看上级程序  ESC返回命令行  Alt+shift+k 查看所有快捷键
+
+
+### 包的相关操作
+install.packsges("包名") # 安装
+update.packages("包名")  # 更新
+library(包名)            # 载入
+
+
+### 文件目录
+getwd()
+setwd(dir = "路径")
+dir() #列出当前路径下的所有文件
+
+
+### 获取帮助help 获取举例example
+help(package = "workflowr")
+??mean
+example(mean)
+example(hist)
+
+
+### 这是一行注释
+### R语言变量定义前不声明，在初次赋值是直接形成,R语言的赋值是通过“<-”或“->”实现，而不是“=”,且R语言区分大小写
+### R中的下标不从0开始，而从1开始。
+### ls() 和 ls.str()列出当前操作中存在的变量,rm(x)删除变量，删除所有变量：rm(list=ls())
+x <- 5
+y <- rnorm(5)
+x
+y
+ls.str()
+
+
+### R语言的多数功能是通过程序内置函数、用户自编函数和对对象的创建和操作实现的。
+# 一个简单的R语言程序回话实例
+# c表示这是一个向量
+age <- c(1,3,5,2,11,9,3,9,12,3)
+weight <- c(4,4,5,7,5,8,7,6,10,10)
+# 求均值
+mean(age)  
+# 求标准差
+sd(weight) 
+# 求相关系数
+cor(age,weight)
+# 进行绘图
+plot(age,weight)
+
+
+### 查看对象长度
+length(age)
+### 查看对象数据类型
+mode(age)
+### 对对象按索引赋值
+age[3] <- 7
+age
+### R语言的数据处理是向量化的,向量长度不一致时，则对短的变量进行循环
+a = age + weight
+a
+
+
+
